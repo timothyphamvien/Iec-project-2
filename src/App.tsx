@@ -7,8 +7,9 @@ import {
   Landmark, DollarSign, Search, ChevronRight, ChevronLeft, Star, Shield, 
   Cpu, Activity, TrendingUp, Award, Mail, Phone, MapPin,
   Facebook, Twitter, Linkedin, Instagram, X, Menu,
-  ExternalLink, Share2, Database, Languages, Handshake
+  ExternalLink, Share2, Database, Languages, Handshake, CheckCircle2, QrCode
 } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { translations } from './translations';
 import { useSiteData, initialData } from './context/SiteContext';
 import InformationHub from './InformationHub';
@@ -84,70 +85,89 @@ const ImageWithSkeleton = ({ src, alt, className, referrerPolicy, loading = "laz
 };
 
 
-const PartnerModal = ({ isOpen, onClose, t }: { isOpen: boolean, onClose: () => void, t: any }) => (
-  <AnimatePresence>
-    {isOpen && (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-          className="absolute inset-0 bg-iec-accent/80 backdrop-blur-sm"
-        />
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          className="relative bg-white w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden"
-        >
-          <div className="p-8 md:p-12">
-            <div className="flex justify-between items-start mb-8">
-              <div>
-                <h2 className="text-2xl font-black text-iec-accent mb-2">{t.modal.title}</h2>
-                <p className="text-sm text-iec-accent/60">{t.modal.subtitle}</p>
-              </div>
-              <button 
-                onClick={onClose}
-                className="w-10 h-10 rounded-full bg-iec-bg flex items-center justify-center text-iec-accent/40 hover:bg-iec-primary hover:text-white transition-all"
-              >
-                <X size={20} />
-              </button>
-            </div>
+const PartnerModal = ({ isOpen, onClose, t }: { isOpen: boolean, onClose: () => void, t: any }) => {
+  const qrUrl = "https://forms.gle/hFK64W4FJ89DZgFX8";
 
-            <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-iec-accent/40 ml-1">{t.modal.company}</label>
-                  <input type="text" className="w-full bg-iec-bg border border-iec-primary/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-iec-primary transition-colors" placeholder="e.g. TechCorp" />
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="absolute inset-0 bg-iec-accent/80 backdrop-blur-sm"
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            className="relative bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl overflow-hidden"
+          >
+            <div className="p-8 md:p-12">
+              <div className="flex justify-between items-start mb-8">
+                <div>
+                  <h2 className="text-2xl font-black text-iec-accent mb-2">
+                    {t.modal.title}
+                  </h2>
+                  <p className="text-sm text-iec-accent/60">
+                    {t.modal.successSubtitle || "Vui lòng quét mã QR bên dưới hoặc bấm nút để đăng ký thông tin đối tác."}
+                  </p>
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-iec-accent/40 ml-1">{t.modal.contact}</label>
-                  <input type="text" className="w-full bg-iec-bg border border-iec-primary/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-iec-primary transition-colors" placeholder="e.g. John Doe" />
-                </div>
+                <button 
+                  onClick={onClose}
+                  className="w-10 h-10 rounded-full bg-iec-bg flex items-center justify-center text-iec-accent/40 hover:bg-iec-primary hover:text-white transition-all"
+                >
+                  <X size={20} />
+                </button>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-iec-accent/40 ml-1">{t.modal.email}</label>
-                  <input type="email" className="w-full bg-iec-bg border border-iec-primary/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-iec-primary transition-colors" placeholder="john@example.com" />
+
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col items-center justify-center py-4 text-center"
+              >
+                <div className="relative mb-8 p-6 bg-white rounded-3xl shadow-xl border border-iec-primary/10 group">
+                  <div className="absolute -top-4 -right-4 w-12 h-12 bg-iec-primary text-white rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                    <QrCode size={24} />
+                  </div>
+                  <QRCodeSVG 
+                    value={qrUrl} 
+                    size={220}
+                    level="H"
+                    includeMargin={true}
+                  />
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-iec-accent/40 ml-1">{t.modal.phone}</label>
-                  <input type="tel" className="w-full bg-iec-bg border border-iec-primary/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-iec-primary transition-colors" placeholder="+84 ..." />
+                
+                <div className="space-y-6 w-full max-w-sm">
+                  <p className="text-sm text-iec-accent/60 leading-relaxed">
+                    {t.modal.subtitle || "Cảm ơn bạn đã quan tâm hợp tác với IEC. Vui lòng quét mã QR ở trên để cung cấp thông tin chi tiết qua Google Form."}
+                  </p>
+                  
+                  <a 
+                    href={qrUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-primary w-full py-4 flex items-center justify-center gap-2 group"
+                  >
+                    {t.modal.submit} <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                  </a>
+                  
+                  <div className="pt-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-iec-accent/30">
+                      Innovation & Entrepreneurship Center
+                    </span>
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase tracking-widest text-iec-accent/40 ml-1">{t.modal.message}</label>
-                <textarea className="w-full bg-iec-bg border border-iec-primary/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-iec-primary transition-colors min-h-[120px]" placeholder={t.modal.placeholderMsg} />
-              </div>
-              <button className="btn-primary w-full py-4 mt-4">{t.modal.submit}</button>
-            </form>
-          </div>
-        </motion.div>
-      </div>
-    )}
-  </AnimatePresence>
-);
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+  );
+};
 
 const SectionHeader = ({ title, subtitle, badge, centered = true, className = "", id }: { title: string, subtitle?: string, badge?: string, centered?: boolean, className?: string, id?: string }) => (
   <div className={`mb-16 ${centered ? 'text-center' : 'text-left'} ${className}`}>

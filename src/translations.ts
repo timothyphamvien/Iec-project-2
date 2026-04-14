@@ -156,7 +156,7 @@ export const translations = {
       phone: "Số điện thoại",
       message: "Tin nhắn",
       placeholderMsg: "Hãy cho chúng tôi biết về tổ chức của bạn và cách bạn muốn hợp tác...",
-      submit: "Gửi đơn đăng ký"
+      submit: "Đăng ký đối tác"
     }
   },
   en: {
@@ -316,7 +316,7 @@ export const translations = {
       phone: "Phone Number",
       message: "Message",
       placeholderMsg: "Tell us about your organization and how you'd like to collaborate...",
-      submit: "Submit Application"
+      submit: "Register as Partner"
     }
   }
 };
