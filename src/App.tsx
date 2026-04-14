@@ -1240,13 +1240,13 @@ const Partners = ({ t }: { t: any }) => {
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
       const { clientWidth } = scrollRef.current;
+      // Scroll by exactly the width of the visible grid (6 columns)
       const scrollAmount = direction === 'left' ? -clientWidth : clientWidth;
       scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
 
   const partnersList = useMemo(() => {
-    // Priority: Firestore Data > initialData
     return data.partners.length > 0 ? data.partners : initialData.partners;
   }, [data.partners]);
 
@@ -1264,7 +1264,6 @@ const Partners = ({ t }: { t: any }) => {
     const current = scrollRef.current;
     if (current) {
       current.addEventListener('scroll', checkScroll);
-      // Also check on resize and when data changes
       window.addEventListener('resize', checkScroll);
       setTimeout(checkScroll, 1000);
     }
@@ -1280,28 +1279,38 @@ const Partners = ({ t }: { t: any }) => {
       href={p.link}
       target="_blank"
       rel="noopener noreferrer"
-      initial={{ opacity: 0, scale: 0.9 }}
-      whileInView={{ opacity: 1, scale: 1 }}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
       whileHover={{ 
-        scale: 1.1, 
-        y: -5,
-        borderColor: "rgba(8, 163, 228, 0.4)",
-        boxShadow: "0 20px 25px -5px rgba(8, 163, 228, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+        y: -8,
+        borderColor: "rgba(8, 163, 228, 0.3)",
+        boxShadow: "0 25px 50px -12px rgba(8, 163, 228, 0.15)"
       }}
       viewport={{ once: true }}
-      transition={{ delay: i * 0.02, type: "spring", stiffness: 300 }}
-      className="relative flex items-center justify-center w-40 h-40 bg-[#F8FBFE] rounded-3xl p-6 border border-transparent transition-all duration-300 group shadow-sm cursor-pointer"
+      transition={{ 
+        delay: (i % 6) * 0.05, 
+        type: "spring", 
+        stiffness: 260, 
+        damping: 20 
+      }}
+      className="relative flex items-center justify-center w-full aspect-square bg-white rounded-[2rem] p-8 border border-gray-100/50 transition-all duration-500 group shadow-sm cursor-pointer overflow-hidden"
       role="listitem"
       aria-label={`Partner: ${p.name}`}
     >
+      {/* Subtle background glow on hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-iec-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      
       <ImageWithSkeleton 
         src={p.logo} 
         alt={`${p.name} logo`}
-        className="max-w-full max-h-full object-contain transition-all duration-500 ease-in-out"
+        className="max-w-full max-h-full object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 ease-out"
         referrerPolicy="no-referrer"
       />
-      <div className="absolute inset-x-0 -bottom-2 opacity-0 group-hover:opacity-100 transition-opacity flex justify-center">
-        <span className="bg-iec-primary text-white text-[8px] font-bold px-2 py-0.5 rounded-full shadow-sm uppercase tracking-wider">Visit Website</span>
+      
+      <div className="absolute inset-x-0 bottom-0 h-1 bg-iec-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+      
+      <div className="absolute inset-x-0 -bottom-2 opacity-0 group-hover:opacity-100 transition-all duration-500 flex justify-center z-10 translate-y-2 group-hover:translate-y-0">
+        <span className="bg-iec-primary text-white text-[7px] font-black px-3 py-1 rounded-full shadow-xl uppercase tracking-[0.2em] backdrop-blur-sm">Visit Website</span>
       </div>
     </motion.a>
   );
@@ -1309,37 +1318,31 @@ const Partners = ({ t }: { t: any }) => {
   if (!partnersData) return null;
 
   return (
-    <section id="partners" className="section-spacing bg-white scroll-mt-20 overflow-hidden relative" aria-labelledby="partners-title">
-      {/* Professional Background Accents */}
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-[#F8FBFE] -skew-x-12 translate-x-1/4 -z-0" aria-hidden="true" />
+    <section id="partners" className="section-spacing bg-[#F8FBFE] scroll-mt-20 overflow-hidden relative" aria-labelledby="partners-title">
+      {/* Background Accents */}
+      <div className="absolute top-0 left-0 w-full h-full opacity-30 pointer-events-none" aria-hidden="true">
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-white -skew-x-12 translate-x-1/4" />
+      </div>
 
       <div className="container-custom relative z-10">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
-          <div className="max-w-2xl">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-            >
-              <div className="inline-block mb-6">
-                <span className="px-4 py-1.5 rounded-full bg-iec-primary/10 border border-iec-primary/20 text-[11px] font-black uppercase tracking-[0.3em] text-iec-primary" role="doc-subtitle">
-                  {partnersData.badge[lang]}
-                </span>
-              </div>
-              <h2 id="partners-title" className="text-4xl md:text-5xl font-black text-iec-accent mb-6 uppercase tracking-tight italic" dangerouslySetInnerHTML={{ __html: partnersData.title[lang] }} />
-              <p className="text-iec-accent/60 font-medium text-lg">
-                {partnersData.subtitle[lang]}
-              </p>
-            </motion.div>
+        <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+          <div className="max-w-3xl">
+            <SectionHeader 
+              id="partners-title"
+              badge={partnersData.badge[lang]}
+              title={partnersData.title[lang]}
+              subtitle={partnersData.subtitle[lang]}
+              centered={false}
+              className="mb-0"
+            />
           </div>
           
-          <div className="flex gap-4">
+          <div className="flex gap-4 mb-8 md:mb-0">
             <button 
               onClick={() => scroll('left')}
               disabled={!canScrollLeft}
-              className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 border ${
-                canScrollLeft ? 'border-iec-primary text-iec-primary hover:bg-iec-primary hover:text-white' : 'border-iec-accent/10 text-iec-accent/20 cursor-not-allowed'
+              className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 border-2 ${
+                canScrollLeft ? 'border-iec-primary text-iec-primary hover:bg-iec-primary hover:text-white shadow-lg shadow-iec-primary/20' : 'border-gray-200 text-gray-300 cursor-not-allowed'
               }`}
               aria-label="Previous partners"
             >
@@ -1348,8 +1351,8 @@ const Partners = ({ t }: { t: any }) => {
             <button 
               onClick={() => scroll('right')}
               disabled={!canScrollRight}
-              className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 border ${
-                canScrollRight ? 'border-iec-primary text-iec-primary hover:bg-iec-primary hover:text-white' : 'border-iec-accent/10 text-iec-accent/20 cursor-not-allowed'
+              className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 border-2 ${
+                canScrollRight ? 'border-iec-primary text-iec-primary hover:bg-iec-primary hover:text-white shadow-lg shadow-iec-primary/20' : 'border-gray-200 text-gray-300 cursor-not-allowed'
               }`}
               aria-label="Next partners"
             >
@@ -1358,18 +1361,21 @@ const Partners = ({ t }: { t: any }) => {
           </div>
         </div>
 
-        {/* Special Partners Cards */}
+        {/* Strategic Partners (2 Cards) */}
         {specialPartners.length > 0 && (
-          <div className="mb-16 grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl">
-            {specialPartners.map((p) => (
+          <div className="mb-20 grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl">
+            {specialPartners.map((p, i) => (
               <motion.div 
                 key={p.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, x: i === 0 ? -30 : 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="bg-[#F8FBFE] rounded-[2.5rem] p-8 md:p-10 flex flex-col md:flex-row items-center gap-8 border border-iec-primary/5 hover:bg-white hover:shadow-xl transition-all duration-500 group"
+                className="bg-white rounded-[2.5rem] p-8 md:p-10 flex flex-col md:flex-row items-center gap-8 border border-iec-primary/10 hover:shadow-[0_20px_50px_rgba(8,163,228,0.15)] transition-all duration-500 group relative overflow-hidden"
               >
-                <div className="w-32 h-32 flex-shrink-0 flex items-center justify-center bg-white rounded-3xl p-4 shadow-sm group-hover:scale-105 transition-transform">
+                {/* Decorative background for card */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-iec-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:bg-iec-primary/10 transition-colors" />
+                
+                <div className="w-36 h-36 flex-shrink-0 flex items-center justify-center bg-[#F8FBFE] rounded-3xl p-6 shadow-inner group-hover:scale-105 transition-transform duration-500">
                   <ImageWithSkeleton 
                     src={p.logo} 
                     alt={p.name} 
@@ -1377,8 +1383,13 @@ const Partners = ({ t }: { t: any }) => {
                     referrerPolicy="no-referrer"
                   />
                 </div>
-                <div className="flex-grow text-center md:text-left">
-                  <h3 className="text-xl font-black text-iec-accent uppercase tracking-tight mb-3 italic">{p.name}</h3>
+                <div className="flex-grow text-center md:text-left relative z-10">
+                  <div className="inline-block mb-3">
+                    <span className="px-3 py-1 rounded-full bg-iec-primary/10 text-[9px] font-black uppercase tracking-widest text-iec-primary border border-iec-primary/20">
+                      Strategic Partner
+                    </span>
+                  </div>
+                  <h3 className="text-2xl font-black text-iec-accent uppercase tracking-tight mb-3 italic group-hover:text-iec-primary transition-colors">{p.name}</h3>
                   <p className="text-sm text-iec-accent/60 font-medium leading-relaxed mb-6 line-clamp-2">
                     {p.description[lang]}
                   </p>
@@ -1386,9 +1397,9 @@ const Partners = ({ t }: { t: any }) => {
                     href={p.link} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-iec-primary hover:gap-3 transition-all"
+                    className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-iec-primary hover:gap-4 transition-all"
                   >
-                    {t.specialPartners?.visit || 'Truy cập website'} <ArrowRight size={14} />
+                    {t.specialPartners?.visit || 'Truy cập website'} <ArrowRight size={16} />
                   </a>
                 </div>
               </motion.div>
@@ -1396,27 +1407,36 @@ const Partners = ({ t }: { t: any }) => {
           </div>
         )}
 
-        {/* Regular Partners Logo Grid */}
-        <div 
-          ref={scrollRef}
-          className="overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-8"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
-          <div className="grid grid-rows-2 grid-flow-col gap-6 w-max min-w-full min-h-[340px]">
-            {isLoading && regularPartners.length === 0 ? (
-              Array(12).fill(0).map((_, i) => (
-                <div key={i} className="w-40 h-40 bg-iec-bg rounded-3xl p-6 flex items-center justify-center" role="listitem">
-                  <Skeleton className="w-full h-full opacity-50" />
-                </div>
-              ))
-            ) : (
-              regularPartners.map((p, i) => (
-                <div key={p.id} className="snap-start">
-                  {renderPartnerLogo(p, i)}
-                </div>
-              ))
-            )}
+        {/* Partner Logo Carousel Grid */}
+        <div className="relative">
+          <div 
+            ref={scrollRef}
+            className="overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-12"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            <div className="grid grid-rows-2 grid-flow-col gap-6 w-max min-w-full">
+              {isLoading && regularPartners.length === 0 ? (
+                Array(12).fill(0).map((_, i) => (
+                  <div key={i} className="w-[calc((100vw-4rem)/2)] md:w-[calc((100vw-8rem)/4)] lg:w-[calc((1200px-10rem)/6)] aspect-square bg-white rounded-3xl p-6 flex items-center justify-center border border-gray-50" role="listitem">
+                    <Skeleton className="w-full h-full opacity-50" />
+                  </div>
+                ))
+              ) : (
+                regularPartners.map((p, i) => (
+                  <div 
+                    key={p.id} 
+                    className="snap-start w-[calc((100vw-4rem)/2)] md:w-[calc((100vw-8rem)/4)] lg:w-[calc((1200px-10rem)/6)]"
+                  >
+                    {renderPartnerLogo(p, i)}
+                  </div>
+                ))
+              )}
+            </div>
           </div>
+          
+          {/* Subtle fade effects for carousel */}
+          <div className="absolute top-0 left-0 h-full w-20 bg-gradient-to-r from-[#F8FBFE] to-transparent pointer-events-none z-10 opacity-50" />
+          <div className="absolute top-0 right-0 h-full w-20 bg-gradient-to-l from-[#F8FBFE] to-transparent pointer-events-none z-10 opacity-50" />
         </div>
       </div>
     </section>

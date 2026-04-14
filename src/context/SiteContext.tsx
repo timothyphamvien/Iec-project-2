@@ -349,17 +349,36 @@ export const initialData: SiteData = {
         keywords: { vi: '', en: '' },
         canonicalUrl: ''
       }
+    },
+    {
+      id: '2',
+      slug: 'quan-tri-rui-ro-chuoi-cung-ung',
+      title: { vi: "Bài viết Quản trị Rủi ro Chuỗi cung ứng", en: "Supply Chain Risk Management" },
+      excerpt: { vi: "Chiến lược quản lý rủi ro chuỗi cung ứng...", en: "Supply chain risk management strategies..." },
+      content: { vi: "<p>Nội dung bài viết Quản trị Rủi ro Chuỗi cung ứng...</p>", en: "<p>Content for Supply Chain Risk Management...</p>" },
+      image: "https://picsum.photos/seed/supplychain/1200/800",
+      categoryId: 'cat-1',
+      date: '14/04/2026',
+      author: 'Admin',
+      featured: false,
+      tags: ['Supply Chain', 'Risk Management'],
+      seo: { 
+        title: { vi: '', en: '' }, 
+        description: { vi: '', en: '' }, 
+        keywords: { vi: '', en: '' },
+        canonicalUrl: ''
+      }
     }
   ],
   partners: [
-    { id: 'p1', name: 'Unicom Hub', logo: 'https://drive.google.com/uc?id=1X_U_85_Wnkd7puRWP2zXSq3wx6zVyJJ', description: { vi: 'Hệ sinh thái kết nối tri thức, công nghệ và doanh nghiệp, thúc đẩy đổi mới sáng tạo.', en: 'Ecosystem connecting knowledge, technology, and enterprises, driving innovation.' }, link: 'https://unicomhub.com/', featured: true, isSpecial: true, order: 1, categoryId: 'cat-partner' },
-    { id: 'p2', name: 'VIFC', logo: 'https://drive.google.com/uc?id=1KK_8QtTLUhUFSYk4XjCKGCgqCkAqpHW7', description: { vi: 'Trung tâm Đổi mới Sáng tạo và Tài chính Việt Nam, hỗ trợ vốn và giải pháp tài chính.', en: 'Vietnam Innovation & Finance Center, supporting capital and financial solutions.' }, link: 'https://vifc.org.vn/', featured: true, isSpecial: true, order: 2, categoryId: 'cat-partner' },
-    { id: 'p3', name: 'ISTED', logo: 'https://drive.google.com/uc?id=1Eu1j8LgaCf2SkjxBoqiSFWesvl1S8val', description: { vi: 'Viện Phát triển khoa học và sáng tạo, đơn vị chủ quản của IEC.', en: 'Institute for Science and Innovation Development, the governing body of IEC.' }, link: 'https://isted.edu.vn/', featured: true, order: 3, categoryId: 'cat-partner' },
-    { id: 'p4', name: 'HUTech University', logo: 'https://drive.google.com/uc?id=1p88TyjrVCKN46yWGDY9xI_cZlMAv3UYE', description: { vi: 'Đối tác chiến lược trong đào tạo và cung ứng nguồn nhân lực chất lượng cao.', en: 'Strategic partner in training and supplying high-quality human resources.' }, link: 'https://www.hutech.edu.vn/', featured: true, order: 4, categoryId: 'cat-tech' },
-    { id: 'p5', name: 'VCCI', logo: 'https://drive.google.com/uc?id=1t5R7k9ro0B39PWIeiFv-D5yHutW5XX7U', description: { vi: 'Liên đoàn Thương mại và Công nghiệp Việt Nam, kết nối cộng đồng doanh nghiệp.', en: 'Vietnam Chamber of Commerce and Industry, connecting the business community.' }, link: 'https://vcci.com.vn/', featured: true, order: 5, categoryId: 'cat-partner' },
-    { id: 'p6', name: 'Google for Startups', logo: 'https://drive.google.com/uc?id=17Yk7phywA3oMz6HqeOQE6HRKoVLSDHkN', description: { vi: 'Hỗ trợ công nghệ và hạ tầng đám mây cho các dự án khởi nghiệp tiềm năng.', en: 'Supporting technology and cloud infrastructure for high-potential startup projects.' }, link: 'https://startups.google.com/', featured: true, order: 6, categoryId: 'cat-tech' },
-    { id: 'p7', name: 'Amazon Web Services', logo: 'https://drive.google.com/uc?id=1BiU76Su3cX6QXDRilRIUqvUPTKjEZIpO', description: { vi: 'Cung cấp nền tảng điện toán đám mây và các dịch vụ hỗ trợ startup bứt phá.', en: 'Providing cloud computing platforms and services to help startups scale.' }, link: 'https://aws.amazon.com/', featured: true, order: 7, categoryId: 'cat-tech' },
-    { id: 'p8', name: 'Microsoft for Startups', logo: 'https://drive.google.com/uc?id=1-oiNrNVG5-lkuSgKOQmT_Ny943XigvlS', description: { vi: 'Chương trình hỗ trợ startup tiếp cận công nghệ và thị trường toàn cầu của Microsoft.', en: 'Microsoft program supporting startups with technology and global market access.' }, link: 'https://startups.microsoft.com/', featured: true, order: 8, categoryId: 'cat-tech' },
+    { id: 'p1', name: 'ISTED', logo: 'https://drive.google.com/uc?id=17Yk7phywA3oMz6HqeOQE6HRKoVLSDHkN', description: { vi: 'Viện Phát triển Khoa học Công nghệ và Giáo dục là tổ chức khoa học, có tư cách pháp nhân và hoạt động theo Luật Khoa học và Công nghệ năm 2013', en: 'Institute for Science, Technology and Education Development is a scientific organization with legal status operating under the 2013 Law on Science and Technology.' }, link: 'https://www.isted.edu.vn', featured: true, isSpecial: true, order: 1, categoryId: 'cat-partner' },
+    { id: 'p2', name: 'Vietnix', logo: 'https://drive.google.com/uc?id=1t5R7k9ro0B39PWIeiFv-D5yHutW5XX7U', description: { vi: 'Vietnix là một nhà cung cấp dịch vụ lưu trữ web và đăng ký tên miền. Vietnix hiện đang phục vụ hơn 50000 khách hàng trên toàn Việt Nam.', en: 'Vietnix is a web hosting and domain registration provider. Vietnix currently serves more than 50,000 customers throughout Vietnam.' }, link: 'https://www.vietnix.vn', featured: true, isSpecial: true, order: 2, categoryId: 'cat-partner' },
+    { id: 'p3', name: 'Unicom Hub', logo: 'https://drive.google.com/uc?id=1X_U_85_Wnkd7puRWP2zXSq3wx6zVyJJ', description: { vi: 'Hệ sinh thái kết nối tri thức, công nghệ và doanh nghiệp, thúc đẩy đổi mới sáng tạo.', en: 'Ecosystem connecting knowledge, technology, and enterprises, driving innovation.' }, link: 'https://unicomhub.com/', featured: true, order: 3, categoryId: 'cat-partner' },
+    { id: 'p4', name: 'VIFC', logo: 'https://drive.google.com/uc?id=1KK_8QtTLUhUFSYk4XjCKGCgqCkAqpHW7', description: { vi: 'Trung tâm Đổi mới Sáng tạo và Tài chính Việt Nam, hỗ trợ vốn và giải pháp tài chính.', en: 'Vietnam Innovation & Finance Center, supporting capital and financial solutions.' }, link: 'https://vifc.org.vn/', featured: true, order: 4, categoryId: 'cat-partner' },
+    { id: 'p5', name: 'HUTech University', logo: 'https://drive.google.com/uc?id=1p88TyjrVCKN46yWGDY9xI_cZlMAv3UYE', description: { vi: 'Đối tác chiến lược trong đào tạo và cung ứng nguồn nhân lực chất lượng cao.', en: 'Strategic partner in training and supplying high-quality human resources.' }, link: 'https://www.hutech.edu.vn/', featured: true, order: 5, categoryId: 'cat-tech' },
+    { id: 'p6', name: 'VCCI', logo: 'https://drive.google.com/uc?id=1t5R7k9ro0B39PWIeiFv-D5yHutW5XX7U', description: { vi: 'Liên đoàn Thương mại và Công nghiệp Việt Nam, kết nối cộng đồng doanh nghiệp.', en: 'Vietnam Chamber of Commerce and Industry, connecting the business community.' }, link: 'https://vcci.com.vn/', featured: true, order: 6, categoryId: 'cat-partner' },
+    { id: 'p7', name: 'Google for Startups', logo: 'https://drive.google.com/uc?id=17Yk7phywA3oMz6HqeOQE6HRKoVLSDHkN', description: { vi: 'Hỗ trợ công nghệ và hạ tầng đám mây cho các dự án khởi nghiệp tiềm năng.', en: 'Supporting technology and cloud infrastructure for high-potential startup projects.' }, link: 'https://startups.google.com/', featured: true, order: 7, categoryId: 'cat-tech' },
+    { id: 'p8', name: 'Amazon Web Services', logo: 'https://drive.google.com/uc?id=1BiU76Su3cX6QXDRilRIUqvUPTKjEZIpO', description: { vi: 'Cung cấp nền tảng điện toán đám mây và các dịch vụ hỗ trợ startup bứt phá.', en: 'Providing cloud computing platforms and services to help startups scale.' }, link: 'https://aws.amazon.com/', featured: true, order: 8, categoryId: 'cat-tech' },
     { id: 'p9', name: 'FPT Software', logo: 'https://drive.google.com/uc?id=1oVC1Y7nwTXeoWhOh7sk_xXW9Wpa5g1yA', description: { vi: 'Tập đoàn công nghệ hàng đầu Việt Nam, đối tác chiến lược trong chuyển đổi số.', en: 'Leading technology corporation in Vietnam, strategic partner in digital transformation.' }, link: 'https://fptsoftware.com/', featured: true, order: 9, categoryId: 'cat-tech' },
     { id: 'p10', name: 'Viettel', logo: 'https://drive.google.com/uc?id=1484WKrzQAQo9zw6cQCwkJU7MljKjxiJm', description: { vi: 'Tập đoàn Công nghiệp - Viễn thông Quân đội, hỗ trợ hạ tầng số quốc gia.', en: 'Military Industry and Telecoms Group, supporting national digital infrastructure.' }, link: 'https://viettel.com.vn/', featured: true, order: 10, categoryId: 'cat-tech' },
     { id: 'p11', name: 'VinGroup', logo: 'https://drive.google.com/uc?id=1ZVZhF_VELLx9beTvJCMhij3Di5fmTwk-', description: { vi: 'Tập đoàn đa ngành hàng đầu Việt Nam.', en: 'Leading multi-sector corporation in Vietnam.' }, link: 'https://vingroup.net/', featured: true, order: 11, categoryId: 'cat-partner' },
@@ -393,7 +412,7 @@ export const initialData: SiteData = {
   settings: {
     siteName: 'IEC HUB',
     contactEmail: 'info@iec.com.vn',
-    contactPhone: '0901234567',
+    contactPhone: '0916781444',
     address: '224 Điện Biên Phủ, Phường Xuân Hòa, Thành phố Hồ Chí Minh',
     socialLinks: {
       facebook: 'https://www.facebook.com/IECdoimoisangtaovakhoinghiep/',
