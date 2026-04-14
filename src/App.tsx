@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useScroll, useInView } from 'motion/react';
 import { 
   ArrowRight, ArrowUpRight, Globe, Zap, GraduationCap, Rocket, 
@@ -10,6 +10,7 @@ import {
   ExternalLink, Share2, Database, Languages, Handshake
 } from 'lucide-react';
 import { translations } from './translations';
+import { useSiteData, initialData } from './context/SiteContext';
 import InformationHub from './InformationHub';
 import AdminApp from './admin/AdminApp';
 
@@ -60,9 +61,9 @@ const ImageWithSkeleton = ({ src, alt, className, referrerPolicy, loading = "laz
   const [hasError, setHasError] = useState(false);
 
   return (
-    <div className={`relative overflow-hidden ${className}`}>
+    <div className={`relative flex items-center justify-center overflow-hidden ${className}`}>
       {!isLoaded && !hasError && (
-        <Skeleton className="absolute inset-0 w-full h-full z-10" />
+        <div className="absolute inset-0 animate-pulse bg-iec-primary/5 rounded-lg z-10" />
       )}
       <img
         src={src}
@@ -74,8 +75,8 @@ const ImageWithSkeleton = ({ src, alt, className, referrerPolicy, loading = "laz
         loading={loading}
       />
       {hasError && (
-        <div className="absolute inset-0 flex items-center justify-center bg-iec-bg text-iec-accent/20 text-[10px] font-bold uppercase text-center p-4">
-          Image Load Error
+        <div className="absolute inset-0 flex items-center justify-center bg-iec-bg text-iec-accent/20 text-[8px] font-bold uppercase text-center p-2">
+          Logo
         </div>
       )}
     </div>
@@ -178,6 +179,7 @@ const Navbar = ({ onPartnerClick, lang, setLang, t }: { onPartnerClick: () => vo
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const isHubListPage = location.pathname === '/hub';
 
   useEffect(() => {
@@ -252,7 +254,7 @@ const Navbar = ({ onPartnerClick, lang, setLang, t }: { onPartnerClick: () => vo
                 onClick={(e) => {
                   e.preventDefault();
                   if (location.pathname !== '/') {
-                    window.location.href = `/#${item.id}`;
+                    navigate(`/#${item.id}`);
                   } else {
                     scrollToSection(item.id);
                   }
@@ -436,6 +438,9 @@ const Navbar = ({ onPartnerClick, lang, setLang, t }: { onPartnerClick: () => vo
 };
 
 const Hero = ({ onPartnerClick, t }: { onPartnerClick: () => void, t: any }) => {
+  const { data, lang } = useSiteData();
+  const heroData = data.homepage.hero;
+  
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
@@ -463,7 +468,7 @@ const Hero = ({ onPartnerClick, t }: { onPartnerClick: () => void, t: any }) => 
       {/* Background Image Layer */}
       <div className="absolute inset-0 z-0">
         <ImageWithSkeleton 
-          src="https://ifc-media.bstarsolutions.com/hinh_ifc_dai_dien_vn_uk_1050x700_original_6fa379678f_e02872c518.jpg" 
+          src={heroData.image} 
           alt="Hero Background" 
           className="w-full h-full object-cover opacity-20"
           referrerPolicy="no-referrer"
@@ -526,7 +531,7 @@ const Hero = ({ onPartnerClick, t }: { onPartnerClick: () => void, t: any }) => 
               transition={{ duration: 0.6, delay: 1.2, ease: "backOut" }}
               className="inline-flex items-center px-6 py-2 rounded-full bg-white/40 backdrop-blur-md border border-white/40 text-iec-primary text-[10px] font-black uppercase tracking-[0.3em] mb-12 shadow-sm"
             >
-              <span>{t.hero.badge}</span>
+              <span>{heroData.badge[lang]}</span>
             </motion.div>
             
             <motion.h1 
@@ -539,7 +544,7 @@ const Hero = ({ onPartnerClick, t }: { onPartnerClick: () => void, t: any }) => 
                   transition={{ duration: 0.8, delay: 0.1, ease: [0.215, 0.61, 0.355, 1] }}
                   className="text-iec-accent"
                 >
-                  {t.hero.title1}
+                  {heroData.title1[lang]}
                 </motion.span>
                 <motion.span 
                   initial={{ opacity: 0, y: 30 }}
@@ -547,7 +552,7 @@ const Hero = ({ onPartnerClick, t }: { onPartnerClick: () => void, t: any }) => 
                   transition={{ duration: 0.8, delay: 0.2, ease: [0.215, 0.61, 0.355, 1] }}
                   className="text-iec-primary"
                 >
-                  {t.hero.title2}
+                  {heroData.title2[lang]}
                 </motion.span>
               </div>
               <div className="flex flex-wrap justify-center gap-x-4">
@@ -557,7 +562,7 @@ const Hero = ({ onPartnerClick, t }: { onPartnerClick: () => void, t: any }) => 
                   transition={{ duration: 0.8, delay: 0.3, ease: [0.215, 0.61, 0.355, 1] }}
                   className="text-iec-accent"
                 >
-                  {t.hero.title3}
+                  {heroData.title3[lang]}
                 </motion.span>
                 <motion.span 
                   initial={{ opacity: 0, y: 30 }}
@@ -565,7 +570,7 @@ const Hero = ({ onPartnerClick, t }: { onPartnerClick: () => void, t: any }) => 
                   transition={{ duration: 0.8, delay: 0.4, ease: [0.215, 0.61, 0.355, 1] }}
                   className="text-iec-accent"
                 >
-                  {t.hero.title4}
+                  {heroData.title4[lang]}
                 </motion.span>
               </div>
             </motion.h1>
@@ -576,7 +581,7 @@ const Hero = ({ onPartnerClick, t }: { onPartnerClick: () => void, t: any }) => 
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-lg md:text-xl text-iec-accent/60 mb-12 max-w-2xl mx-auto font-medium"
             >
-              {t.hero.subtitle}
+              {heroData.subtitle[lang]}
             </motion.p>
             
             <motion.div 
@@ -621,32 +626,37 @@ const Hero = ({ onPartnerClick, t }: { onPartnerClick: () => void, t: any }) => 
 };
 
 const About = ({ t }: { t: any }) => {
+  const { data, lang } = useSiteData();
+  const aboutData = data.homepage.about;
+
+  if (!aboutData) return null;
+
   const highlights = [
     { 
-      title: t.about.highlights[0].title, 
+      title: aboutData.highlights[0]?.title[lang] || "", 
       icon: <Zap />, 
-      desc: t.about.highlights[0].desc, 
+      desc: aboutData.highlights[0]?.desc[lang] || "", 
       color: "text-iec-primary", 
       bgColor: "bg-iec-primary/5" 
     },
     { 
-      title: t.about.highlights[1].title, 
+      title: aboutData.highlights[1]?.title[lang] || "", 
       icon: <GraduationCap />, 
-      desc: t.about.highlights[1].desc, 
+      desc: aboutData.highlights[1]?.desc[lang] || "", 
       color: "text-blue-600", 
       bgColor: "bg-blue-50" 
     },
     { 
       icon: <Rocket />, 
-      title: t.about.highlights[2].title, 
-      desc: t.about.highlights[2].desc, 
+      title: aboutData.highlights[2]?.title[lang] || "", 
+      desc: aboutData.highlights[2]?.desc[lang] || "", 
       color: "text-indigo-600", 
       bgColor: "bg-indigo-50" 
     },
     { 
       icon: <Layers />, 
-      title: t.about.highlights[3].title, 
-      desc: t.about.highlights[3].desc, 
+      title: aboutData.highlights[3]?.title[lang] || "", 
+      desc: aboutData.highlights[3]?.desc[lang] || "", 
       color: "text-teal-600", 
       bgColor: "bg-teal-50" 
     },
@@ -668,31 +678,28 @@ const About = ({ t }: { t: any }) => {
           >
             <div className="inline-block mb-6">
               <span className="px-4 py-1.5 rounded-full bg-iec-primary/10 border border-iec-primary/20 text-[11px] font-black uppercase tracking-[0.3em] text-iec-primary" role="doc-subtitle">
-                {t.about.badge}
+                {aboutData.badge[lang]}
               </span>
             </div>
-            <h2 id="about-title" className="text-4xl md:text-5xl font-black text-iec-accent mb-8 uppercase tracking-tight italic leading-[1.1]" dangerouslySetInnerHTML={{ __html: t.about.title }} />
+            <h2 id="about-title" className="text-4xl md:text-5xl font-black text-iec-accent mb-8 uppercase tracking-tight italic leading-[1.1]" dangerouslySetInnerHTML={{ __html: aboutData.title[lang] }} />
             
             <div className="space-y-6 text-lg text-iec-accent/80 font-medium leading-relaxed">
               <p>
-                {t.about.desc1}
-              </p>
-              <p>
-                {t.about.desc2}
+                {aboutData.description[lang]}
               </p>
               <p className="text-base text-iec-accent/60 italic">
-                {t.about.quote}
+                {aboutData.quote[lang]}
               </p>
             </div>
 
             <div className="mt-10 flex flex-wrap gap-4">
               <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white shadow-sm border border-iec-primary/5">
                 <div className="w-2 h-2 rounded-full bg-iec-primary animate-pulse" aria-hidden="true" />
-                <span className="text-xs font-bold uppercase tracking-wider text-iec-accent">{t.about.h1}</span>
+                <span className="text-xs font-bold uppercase tracking-wider text-iec-accent">{aboutData.h1[lang]}</span>
               </div>
               <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white shadow-sm border border-iec-primary/5">
                 <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" aria-hidden="true" />
-                <span className="text-xs font-bold uppercase tracking-wider text-iec-accent">{t.about.h2}</span>
+                <span className="text-xs font-bold uppercase tracking-wider text-iec-accent">{aboutData.h2[lang]}</span>
               </div>
             </div>
           </motion.div>
@@ -707,8 +714,8 @@ const About = ({ t }: { t: any }) => {
             <div className="relative z-10 rounded-[3rem] overflow-hidden shadow-2xl border-8 border-white group">
               <div className="absolute inset-0 bg-iec-primary/10 group-hover:bg-transparent transition-colors duration-500 z-10" aria-hidden="true" />
               <img 
-                src="https://ifc-media.bstarsolutions.com/hinh_ifc_dai_dien_vn_uk_1050x700_original_6fa379678f_e02872c518.jpg" 
-                alt="IEC Innovation Center - A professional view of our modern technology hub and collaborative workspace" 
+                src={aboutData.image} 
+                alt="IEC Innovation Center" 
                 className="w-full aspect-[4/5] object-cover group-hover:scale-105 transition-transform duration-700"
                 referrerPolicy="no-referrer"
                 loading="lazy"
@@ -872,7 +879,11 @@ const CoreValues = ({ t }: { t: any }) => {
 
 
 const Ecosystem = ({ t }: { t: any }) => {
+  const { data, lang } = useSiteData();
+  const ecosystemData = data.homepage.ecosystem;
   const [activeNode, setActiveNode] = useState<number | null>(1); // Default to Startups
+
+  if (!ecosystemData) return null;
 
   const stakeholders = [
     { 
@@ -924,9 +935,9 @@ const Ecosystem = ({ t }: { t: any }) => {
       <div className="container-custom relative z-10">
         <SectionHeader 
           id="ecosystem-title"
-          badge={t.ecosystem.badge}
-          title={t.ecosystem.title} 
-          subtitle={t.ecosystem.subtitle}
+          badge={ecosystemData.badge[lang]}
+          title={ecosystemData.title[lang]} 
+          subtitle={ecosystemData.subtitle[lang]}
         />
         
         <div className="flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-24 min-h-[600px] max-w-6xl mx-auto">
@@ -1093,11 +1104,16 @@ const Ecosystem = ({ t }: { t: any }) => {
 };
 
 const Impact = ({ t }: { t: any }) => {
+  const { data, lang } = useSiteData();
+  const impactData = data.homepage.impact;
+
+  if (!impactData) return null;
+
   const stats = [
-    { label: t.impact.stats[0].label, value: t.impact.stats[0].value, icon: <Calendar />, color: "text-blue-400" },
-    { label: t.impact.stats[1].label, value: t.impact.stats[1].value, icon: <Handshake />, color: "text-teal-400" },
-    { label: t.impact.stats[2].label, value: t.impact.stats[2].value, icon: <Rocket />, color: "text-orange-400" },
-    { label: t.impact.stats[3].label, value: t.impact.stats[3].value, icon: <Users />, color: "text-rose-400" },
+    { label: impactData.stats[0]?.label[lang] || "", value: impactData.stats[0]?.value || "", icon: <Calendar />, color: "text-blue-400" },
+    { label: impactData.stats[1]?.label[lang] || "", value: impactData.stats[1]?.value || "", icon: <Handshake />, color: "text-teal-400" },
+    { label: impactData.stats[2]?.label[lang] || "", value: impactData.stats[2]?.value || "", icon: <Rocket />, color: "text-orange-400" },
+    { label: impactData.stats[3]?.label[lang] || "", value: impactData.stats[3]?.value || "", icon: <Users />, color: "text-rose-400" },
   ];
 
   return (
@@ -1117,7 +1133,7 @@ const Impact = ({ t }: { t: any }) => {
             className="inline-block mb-4"
           >
             <span className="px-4 py-1 rounded-full bg-white/10 border border-white/20 text-[10px] font-black uppercase tracking-[0.3em] text-iec-primary">
-              {t.impact.badge}
+              {impactData.badge[lang]}
             </span>
           </motion.div>
           <motion.h2 
@@ -1125,7 +1141,7 @@ const Impact = ({ t }: { t: any }) => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic"
-            dangerouslySetInnerHTML={{ __html: t.impact.title }}
+            dangerouslySetInnerHTML={{ __html: impactData.title[lang] }}
           />
           <motion.div 
             initial={{ width: 0 }}
@@ -1163,26 +1179,14 @@ const Impact = ({ t }: { t: any }) => {
 };
 
 const FeaturedPartners = ({ t }: { t: any }) => {
-  const partners = [
-    { 
-      id: 'unicom',
-      name: t.specialPartners.unicom.name, 
-      logo: "https://lh3.googleusercontent.com/d/1kCNZcdZNX0_4XFRTLoaQzIi3hLLrfrHP",
-      desc: t.specialPartners.unicom.desc,
-      link: t.specialPartners.unicom.link
-    },
-    { 
-      id: 'vifc',
-      name: t.specialPartners.vifc.name, 
-      logo: "https://lh3.googleusercontent.com/d/1dlTzouCgKtivLVnFdG1QmWNoTVVXq7E4",
-      desc: t.specialPartners.vifc.desc,
-      link: t.specialPartners.vifc.link
-    }
-  ];
+  const { data, lang } = useSiteData();
+  const featuredPartners = data.partners.filter(p => p.featured);
+
+  if (featuredPartners.length === 0) return null;
 
   return (
     <div className="mt-20 grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-      {partners.map((p) => (
+      {featuredPartners.map((p) => (
         <div key={p.id} className="bg-[#F8FBFE] rounded-[2.5rem] p-8 md:p-10 flex flex-col md:flex-row items-center gap-8 border border-iec-primary/5 hover:bg-white hover:shadow-xl transition-all duration-500">
           <div className="w-32 h-32 flex-shrink-0 flex items-center justify-center bg-white rounded-3xl p-4 shadow-sm">
             <ImageWithSkeleton 
@@ -1195,7 +1199,7 @@ const FeaturedPartners = ({ t }: { t: any }) => {
           <div className="flex-grow text-center md:text-left">
             <h3 className="text-xl font-black text-iec-accent uppercase tracking-tight mb-3 italic">{p.name}</h3>
             <p className="text-sm text-iec-accent/60 font-medium leading-relaxed mb-6">
-              {p.desc}
+              {p.description[lang]}
             </p>
             <a 
               href={p.link} 
@@ -1213,13 +1217,15 @@ const FeaturedPartners = ({ t }: { t: any }) => {
 };
 
 const Partners = ({ t }: { t: any }) => {
+  const { data, lang } = useSiteData();
+  const partnersData = data.homepage?.partners || initialData.homepage.partners;
   const [isLoading, setIsLoading] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800);
+    const timer = setTimeout(() => setIsLoading(false), 500);
     return () => clearTimeout(timer);
   }, []);
 
@@ -1231,15 +1237,6 @@ const Partners = ({ t }: { t: any }) => {
     }
   };
 
-  useEffect(() => {
-    const current = scrollRef.current;
-    if (current) {
-      current.addEventListener('scroll', checkScroll);
-      checkScroll();
-    }
-    return () => current?.removeEventListener('scroll', checkScroll);
-  }, [isLoading]);
-
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
       const { clientWidth } = scrollRef.current;
@@ -1248,26 +1245,41 @@ const Partners = ({ t }: { t: any }) => {
     }
   };
 
-  const partners = [
-    { name: "VIFC", domain: "vifc.org.vn", logo: "https://lh3.googleusercontent.com/d/1dlTzouCgKtivLVnFdG1QmWNoTVVXq7E4" },
-    { name: "SIHUB", domain: "sihub.vn", logo: "https://sihub.gov.vn/storage/company/1755050022_logo.png" },
-    { name: "Saigon Innovation Hub", domain: "sihub.gov.vn", logo: "https://dost.hochiminhcity.gov.vn/static/demo/images/logo_so_vn.png" },
-    { name: "Kati Studio", domain: "katistudio.vn", logo: "https://chatkati.com/Chatkati_backlogo.svg" },
-    { name: "Trường ĐH Bách Khoa", domain: "hcmut.edu.vn", logo: "https://hcmut.edu.vn/img/logo.jpg?t=26899198" },
-    { name: "Viện Phát triển khoa học và sáng tạo", domain: "isted.edu.vn", logo: "https://isted.edu.vn/wp-content/uploads/2026/01/logo-ISTED.png" },
-    { name: "Partner 7", domain: "drive.google.com", logo: "https://lh3.googleusercontent.com/d/1Eu1j8LgaCf2SkjxBoqiSFWesvl1S8val" },
-    { name: "Partner 8", domain: "drive.google.com", logo: "https://lh3.googleusercontent.com/d/1p88TyjrVCKN46yWGDY9xI_cZlMAv3UYE" },
-    { name: "Partner 9", domain: "drive.google.com", logo: "https://lh3.googleusercontent.com/d/1t5R7k9ro0B39PWIeiFv-D5yHutW5XX7U" },
-    { name: "Partner 10", domain: "drive.google.com", logo: "https://lh3.googleusercontent.com/d/17Yk7phywA3oMz6HqeOQE6HRKoVLSDHkN" },
-    { name: "Partner 11", domain: "drive.google.com", logo: "https://lh3.googleusercontent.com/d/1BiU76Su3cX6QXDRilRIUqvUPTKjEZIpO" },
-    { name: "Partner 12", domain: "drive.google.com", logo: "https://lh3.googleusercontent.com/d/1-oiNrNVG5-lkuSgKOQmT_Ny943XigvlS" },
-    { name: "Partner 13", domain: "drive.google.com", logo: "https://lh3.googleusercontent.com/d/1oVC1Y7nwTXeoWhOh7sk_xXW9Wpa5g1yA" },
-    { name: "Partner 14", domain: "drive.google.com", logo: "https://lh3.googleusercontent.com/d/1484WKrzQAQo9zw6cQCwkJU7MljKjxiJm" }
-  ];
+  const partnersList = useMemo(() => {
+    // Priority: Firestore Data > initialData
+    return data.partners.length > 0 ? data.partners : initialData.partners;
+  }, [data.partners]);
 
-  const renderPartner = (p: any, i: number) => (
-    <motion.div
-      key={i}
+  const regularPartners = useMemo(() => {
+    return partnersList
+      .filter(p => !p.isSpecial)
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
+  }, [partnersList]);
+
+  const specialPartners = useMemo(() => {
+    return partnersList.filter(p => p.isSpecial).slice(0, 2);
+  }, [partnersList]);
+
+  useEffect(() => {
+    const current = scrollRef.current;
+    if (current) {
+      current.addEventListener('scroll', checkScroll);
+      // Also check on resize and when data changes
+      window.addEventListener('resize', checkScroll);
+      setTimeout(checkScroll, 1000);
+    }
+    return () => {
+      current?.removeEventListener('scroll', checkScroll);
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, [isLoading, regularPartners]);
+
+  const renderPartnerLogo = (p: any, i: number) => (
+    <motion.a
+      key={p.id}
+      href={p.link}
+      target="_blank"
+      rel="noopener noreferrer"
       initial={{ opacity: 0, scale: 0.9 }}
       whileInView={{ opacity: 1, scale: 1 }}
       whileHover={{ 
@@ -1278,18 +1290,23 @@ const Partners = ({ t }: { t: any }) => {
       }}
       viewport={{ once: true }}
       transition={{ delay: i * 0.02, type: "spring", stiffness: 300 }}
-      className="relative flex items-center justify-center aspect-square bg-[#F8FBFE] rounded-3xl p-6 border border-transparent transition-all duration-300 group shadow-sm"
+      className="relative flex items-center justify-center w-40 h-40 bg-[#F8FBFE] rounded-3xl p-6 border border-transparent transition-all duration-300 group shadow-sm cursor-pointer"
       role="listitem"
       aria-label={`Partner: ${p.name}`}
     >
       <ImageWithSkeleton 
-        src={p.logo || `https://logo.clearbit.com/${p.domain}`} 
+        src={p.logo} 
         alt={`${p.name} logo`}
         className="max-w-full max-h-full object-contain transition-all duration-500 ease-in-out"
         referrerPolicy="no-referrer"
       />
-    </motion.div>
+      <div className="absolute inset-x-0 -bottom-2 opacity-0 group-hover:opacity-100 transition-opacity flex justify-center">
+        <span className="bg-iec-primary text-white text-[8px] font-bold px-2 py-0.5 rounded-full shadow-sm uppercase tracking-wider">Visit Website</span>
+      </div>
+    </motion.a>
   );
+
+  if (!partnersData) return null;
 
   return (
     <section id="partners" className="section-spacing bg-white scroll-mt-20 overflow-hidden relative" aria-labelledby="partners-title">
@@ -1307,12 +1324,12 @@ const Partners = ({ t }: { t: any }) => {
             >
               <div className="inline-block mb-6">
                 <span className="px-4 py-1.5 rounded-full bg-iec-primary/10 border border-iec-primary/20 text-[11px] font-black uppercase tracking-[0.3em] text-iec-primary" role="doc-subtitle">
-                  {t.partners.badge}
+                  {partnersData.badge[lang]}
                 </span>
               </div>
-              <h2 id="partners-title" className="text-4xl md:text-5xl font-black text-iec-accent mb-6 uppercase tracking-tight italic" dangerouslySetInnerHTML={{ __html: t.partners.title }} />
+              <h2 id="partners-title" className="text-4xl md:text-5xl font-black text-iec-accent mb-6 uppercase tracking-tight italic" dangerouslySetInnerHTML={{ __html: partnersData.title[lang] }} />
               <p className="text-iec-accent/60 font-medium text-lg">
-                {t.partners.subtitle}
+                {partnersData.subtitle[lang]}
               </p>
             </motion.div>
           </div>
@@ -1341,35 +1358,74 @@ const Partners = ({ t }: { t: any }) => {
           </div>
         </div>
 
+        {/* Special Partners Cards */}
+        {specialPartners.length > 0 && (
+          <div className="mb-16 grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl">
+            {specialPartners.map((p) => (
+              <motion.div 
+                key={p.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="bg-[#F8FBFE] rounded-[2.5rem] p-8 md:p-10 flex flex-col md:flex-row items-center gap-8 border border-iec-primary/5 hover:bg-white hover:shadow-xl transition-all duration-500 group"
+              >
+                <div className="w-32 h-32 flex-shrink-0 flex items-center justify-center bg-white rounded-3xl p-4 shadow-sm group-hover:scale-105 transition-transform">
+                  <ImageWithSkeleton 
+                    src={p.logo} 
+                    alt={p.name} 
+                    className="max-w-full max-h-full object-contain"
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
+                <div className="flex-grow text-center md:text-left">
+                  <h3 className="text-xl font-black text-iec-accent uppercase tracking-tight mb-3 italic">{p.name}</h3>
+                  <p className="text-sm text-iec-accent/60 font-medium leading-relaxed mb-6 line-clamp-2">
+                    {p.description[lang]}
+                  </p>
+                  <a 
+                    href={p.link} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-iec-primary hover:gap-3 transition-all"
+                  >
+                    {t.specialPartners?.visit || 'Truy cập website'} <ArrowRight size={14} />
+                  </a>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
+
+        {/* Regular Partners Logo Grid */}
         <div 
           ref={scrollRef}
           className="overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-8"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          <div className="grid grid-rows-2 grid-flow-col gap-8 w-max min-w-full">
-            {isLoading ? (
+          <div className="grid grid-rows-2 grid-flow-col gap-6 w-max min-w-full min-h-[340px]">
+            {isLoading && regularPartners.length === 0 ? (
               Array(12).fill(0).map((_, i) => (
                 <div key={i} className="w-40 h-40 bg-iec-bg rounded-3xl p-6 flex items-center justify-center" role="listitem">
                   <Skeleton className="w-full h-full opacity-50" />
                 </div>
               ))
             ) : (
-              partners.map((p, i) => (
-                <div key={i} className="w-40 h-40 snap-start">
-                  {renderPartner(p, i)}
+              regularPartners.map((p, i) => (
+                <div key={p.id} className="snap-start">
+                  {renderPartnerLogo(p, i)}
                 </div>
               ))
             )}
           </div>
         </div>
-
-        <FeaturedPartners t={t} />
       </div>
     </section>
   );
 };
 
 const Team = ({ t }: { t: any }) => {
+  const { data, lang } = useSiteData();
+  const teamData = data.homepage.team;
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
@@ -1377,32 +1433,9 @@ const Team = ({ t }: { t: any }) => {
     return () => clearTimeout(timer);
   }, []);
 
-  const members = [
-    { 
-      name: t.team.members[0].name, 
-      role: t.team.members[0].role, 
-      img: "https://lh3.googleusercontent.com/d/1_KM3EA5_Wnkd7puRWP2zXSq3wx6zVyJJ",
-      linkedin: "https://www.linkedin.com/in/sky-hoang-9a22b0245/"
-    },
-    { 
-      name: t.team.members[1].name, 
-      role: t.team.members[1].role, 
-      img: "https://lh3.googleusercontent.com/d/1KK_8QtTLUhUFSYk4XjCKGCgqCkAqpHW7",
-      linkedin: "https://www.linkedin.com/me?trk=p_mwlite_feed-secondary_nav"
-    },
-    { 
-      name: t.team.members[2].name, 
-      role: t.team.members[2].role, 
-      img: "https://lh3.googleusercontent.com/d/1054qNERsBFUDcQ7eaH8jIduPnvMnQ_PN",
-      linkedin: "https://www.linkedin.com/in/huy-nguyen-nft/"
-    },
-    { 
-      name: t.team.members[3].name, 
-      role: t.team.members[3].role, 
-      img: "https://lh3.googleusercontent.com/d/1r9Q6Tl8BgyZoF4eDpyr5WU5DJmftcUre",
-      linkedin: "https://www.linkedin.com/in/timphamtech/"
-    },
-  ];
+  if (!teamData) return null;
+
+  const members = teamData.members;
 
   return (
     <section id="team" className="section-spacing bg-white scroll-mt-20 relative overflow-hidden">
@@ -1415,9 +1448,9 @@ const Team = ({ t }: { t: any }) => {
       <div className="container-custom relative z-10">
         <SectionHeader 
           id="team-title"
-          badge={t.team.badge}
-          title={t.team.title} 
-          subtitle={t.team.subtitle}
+          badge={teamData.badge[lang]}
+          title={teamData.title[lang]} 
+          subtitle={teamData.subtitle[lang]}
           centered={true}
         />
 
@@ -1459,7 +1492,7 @@ const Team = ({ t }: { t: any }) => {
 
                   <div className="flex-grow">
                     <h3 className="text-2xl font-black text-iec-accent mb-3 group-hover:text-iec-primary transition-colors tracking-tight uppercase italic">{member.name}</h3>
-                    <p className="text-iec-primary text-[11px] font-black uppercase tracking-[0.2em] leading-relaxed px-4 opacity-80 mb-6">{member.role}</p>
+                    <p className="text-iec-primary text-[11px] font-black uppercase tracking-[0.2em] leading-relaxed px-4 opacity-80 mb-6">{member.role[lang]}</p>
                   </div>
 
                   {/* Professional Links */}
@@ -1492,6 +1525,11 @@ const Team = ({ t }: { t: any }) => {
 };
 
 const JoinWithUs = ({ onPartnerClick, t }: { onPartnerClick: () => void, t: any }) => {
+  const { data, lang } = useSiteData();
+  const joinData = data.homepage.join;
+
+  if (!joinData) return null;
+
   return (
     <section id="join" className="py-24 bg-iec-primary relative overflow-hidden" aria-labelledby="join-title">
       {/* Visual background elements */}
@@ -1550,7 +1588,7 @@ const JoinWithUs = ({ onPartnerClick, t }: { onPartnerClick: () => void, t: any 
             className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-black uppercase tracking-[0.3em] mb-8"
           >
             <Rocket size={14} className="animate-bounce" />
-            <span>{t.join.badge}</span>
+            <span>{joinData.badge[lang]}</span>
           </motion.div>
           
           <motion.h2
@@ -1561,7 +1599,7 @@ const JoinWithUs = ({ onPartnerClick, t }: { onPartnerClick: () => void, t: any 
             transition={{ delay: 0.1 }}
             className="text-4xl md:text-7xl font-black text-white mb-8 tracking-tighter leading-tight"
           >
-            {t.join.title1} <br className="hidden md:block" /> {t.join.title2}
+            {joinData.title1[lang]} <br className="hidden md:block" /> {joinData.title2[lang]}
           </motion.h2>
           
           <motion.p
@@ -1571,7 +1609,7 @@ const JoinWithUs = ({ onPartnerClick, t }: { onPartnerClick: () => void, t: any 
             transition={{ delay: 0.2 }}
             className="text-xl text-white/80 mb-12 max-w-2xl mx-auto font-medium leading-relaxed"
           >
-            {t.join.subtitle}
+            {joinData.subtitle[lang]}
           </motion.p>
           
           <motion.div
@@ -1603,6 +1641,9 @@ const JoinWithUs = ({ onPartnerClick, t }: { onPartnerClick: () => void, t: any 
 };
 
 const Footer = ({ t }: { t: any }) => {
+  const { data } = useSiteData();
+  const { settings } = data;
+
   return (
     <footer className="bg-white border-t border-iec-primary/10 pt-20 pb-10">
       <div className="container-custom">
@@ -1621,9 +1662,9 @@ const Footer = ({ t }: { t: any }) => {
             </p>
             <div className="flex gap-4">
               {[
-                { Icon: Globe, color: "text-blue-500", bg: "bg-blue-50", url: "https://iec.com.vn" },
-                { Icon: Facebook, color: "text-blue-600", bg: "bg-blue-50", url: "https://www.facebook.com/IECdoimoisangtaovakhoinghiep/" },
-                { Icon: Linkedin, color: "text-indigo-600", bg: "bg-indigo-50", url: "https://www.linkedin.com/company/vietnam-iec/about/?viewAsMember=true" }
+                { Icon: Globe, color: "text-blue-500", bg: "bg-blue-50", url: settings.socialLinks.website || "https://iec.com.vn" },
+                { Icon: Facebook, color: "text-blue-600", bg: "bg-blue-50", url: settings.socialLinks.facebook || "https://www.facebook.com/IECdoimoisangtaovakhoinghiep/" },
+                { Icon: Linkedin, color: "text-blue-700", bg: "bg-blue-50", url: settings.socialLinks.linkedin || "https://www.linkedin.com/company/vietnam-iec/about/?viewAsMember=true" }
               ].map((item, i) => (
                 <a 
                   key={i} 
@@ -1632,7 +1673,7 @@ const Footer = ({ t }: { t: any }) => {
                   rel="noopener noreferrer"
                   className={`w-10 h-10 rounded-lg ${item.bg} flex items-center justify-center ${item.color} hover:bg-iec-primary hover:text-white transition-all cursor-pointer shadow-sm`}
                 >
-                  <item.Icon size={18} />
+                  <item.Icon size={18} strokeWidth={2.5} />
                 </a>
               ))}
             </div>
@@ -1659,15 +1700,15 @@ const Footer = ({ t }: { t: any }) => {
             <ul className="space-y-4 text-sm text-iec-accent/60 font-medium">
               <li className="flex items-center gap-3 hover:text-iec-primary transition-colors cursor-pointer">
                 <Mail size={14} className="text-orange-500" /> 
-                <a href="mailto:Info@iec.com.vn">Info@iec.com.vn</a>
+                <a href={`mailto:${settings.contactEmail}`}>{settings.contactEmail}</a>
               </li>
               <li className="flex items-center gap-3 hover:text-iec-primary transition-colors cursor-pointer">
                 <Phone size={14} className="text-green-500" /> 
-                <a href="tel:0916781444">0916781444</a>
+                <a href={`tel:${settings.contactPhone}`}>{settings.contactPhone}</a>
               </li>
               <li className="flex items-center gap-3 hover:text-iec-primary transition-colors cursor-pointer">
                 <MapPin size={14} className="text-red-500" /> 
-                {t.footer.address}
+                {settings.address}
               </li>
             </ul>
           </div>
@@ -1698,7 +1739,7 @@ const Footer = ({ t }: { t: any }) => {
         
         <div className="pt-8 border-t border-iec-primary/5 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-[10px] text-iec-accent/40 font-bold uppercase tracking-widest">
-            {t.footer.copyright}
+            {t.footer.copyright} <span className="ml-2 opacity-50">v1.0.6</span>
           </p>
           <div className="flex gap-8 text-[10px] text-iec-accent/40 font-bold uppercase tracking-widest">
             <a href="#" className="hover:text-iec-primary transition-colors">{t.footer.privacy}</a>
@@ -1711,16 +1752,15 @@ const Footer = ({ t }: { t: any }) => {
 };
 
 const Activities = ({ t }: { t: any }) => {
+  const { data, lang } = useSiteData();
+  const activitiesData = data.homepage.activities;
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
-  const activities = [
-    { id: 1, image: "https://lh3.googleusercontent.com/d/18P9xAa5PNI7L4x4x5-speSupuApOEqH2", title: "Hoạt động đào tạo tại Kizuna" },
-    { id: 2, image: "https://lh3.googleusercontent.com/d/1zWHS8BgqUJIq4CzCRBBfBPgL4_iN5VPS", title: "Hoạt động đào tạo tại Kizuna" },
-    { id: 3, image: "https://lh3.googleusercontent.com/d/1ZVZhF_VELLx9beTvJCMhij3Di5fmTwk-", title: "Hoạt động khởi nghiệp tại HUTech" },
-    { id: 4, image: "https://lh3.googleusercontent.com/d/1nfBhy-U1CB66nF2F-5VlL7gvmthPdBB4", title: "Hoạt động hợp tác với VCCI" },
-  ];
+  if (!activitiesData) return null;
+
+  const activities = activitiesData.items;
 
   const checkScroll = () => {
     if (scrollRef.current) {
@@ -1748,18 +1788,18 @@ const Activities = ({ t }: { t: any }) => {
   };
 
   return (
-    <section className="section-spacing bg-white overflow-hidden">
+    <section id="activities" className="section-spacing bg-white overflow-hidden">
       <div className="container-custom">
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
           <div className="max-w-2xl">
             <div className="inline-block mb-4">
               <span className="px-4 py-1.5 rounded-full bg-iec-primary/10 border border-iec-primary/20 text-[11px] font-black uppercase tracking-[0.3em] text-iec-primary">
-                {t.activities.badge}
+                {activitiesData.badge[lang]}
               </span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-black text-iec-accent uppercase tracking-tight italic" dangerouslySetInnerHTML={{ __html: t.activities.title }} />
+            <h2 className="text-4xl md:text-5xl font-black text-iec-accent uppercase tracking-tight italic" dangerouslySetInnerHTML={{ __html: activitiesData.title[lang] }} />
             <p className="mt-4 text-iec-accent/60 font-medium max-w-xl">
-              {t.activities.subtitle}
+              {activitiesData.subtitle[lang]}
             </p>
           </div>
           <div className="flex gap-4">
@@ -1797,14 +1837,14 @@ const Activities = ({ t }: { t: any }) => {
               <div className="relative aspect-[4/3] rounded-[2.5rem] overflow-hidden shadow-lg">
                 <ImageWithSkeleton 
                   src={activity.image} 
-                  alt={activity.title}
+                  alt={activity.title[lang]}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-iec-accent via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
                 <div className="absolute bottom-0 left-0 right-0 p-8">
                   <h3 className="text-xl font-black text-white uppercase tracking-tight leading-tight">
-                    {activity.title}
+                    {activity.title[lang]}
                   </h3>
                 </div>
               </div>
@@ -1824,7 +1864,8 @@ const ScrollToTop = () => {
   return null;
 };
 
-const MainLayout = ({ t, onPartnerClick, lang, setLang }: { t: any, onPartnerClick: () => void, lang: 'vi' | 'en', setLang: (l: 'vi' | 'en') => void }) => {
+const MainLayout = ({ t, onPartnerClick }: { t: any, onPartnerClick: () => void }) => {
+  const { data, lang, setLang } = useSiteData();
   const location = useLocation();
   
   useEffect(() => {
@@ -1848,6 +1889,20 @@ const MainLayout = ({ t, onPartnerClick, lang, setLang }: { t: any, onPartnerCli
     }
   }, [location]);
 
+  const sectionComponents: { [key: string]: React.ReactNode } = {
+    hero: <Hero onPartnerClick={onPartnerClick} t={t} />,
+    about: <About t={t} />,
+    values: <CoreValues t={t} />,
+    ecosystem: <Ecosystem t={t} />,
+    impact: <Impact t={t} />,
+    activities: <Activities t={t} />,
+    team: <Team t={t} />,
+    partners: <Partners t={t} />,
+    join: <JoinWithUs onPartnerClick={onPartnerClick} t={t} />,
+  };
+
+  const sortedSections = [...data.homepage.sections].sort((a, b) => a.order - b.order);
+
   return (
     <>
       <Navbar 
@@ -1857,15 +1912,13 @@ const MainLayout = ({ t, onPartnerClick, lang, setLang }: { t: any, onPartnerCli
         t={t}
       />
       <main>
-        <Hero onPartnerClick={onPartnerClick} t={t} />
-        <About t={t} />
-        <CoreValues t={t} />
-        <Ecosystem t={t} />
-        <Impact t={t} />
-        <Activities t={t} />
-        <Team t={t} />
-        <Partners t={t} />
-        <JoinWithUs onPartnerClick={onPartnerClick} t={t} />
+        {sortedSections.map(section => (
+          section.enabled && sectionComponents[section.id] ? (
+            <React.Fragment key={section.id}>
+              {sectionComponents[section.id]}
+            </React.Fragment>
+          ) : null
+        ))}
       </main>
       <Footer t={t} />
     </>
@@ -1874,7 +1927,7 @@ const MainLayout = ({ t, onPartnerClick, lang, setLang }: { t: any, onPartnerCli
 
 export default function App() {
   const [isPartnerModalOpen, setIsPartnerModalOpen] = useState(false);
-  const [lang, setLang] = useState<'vi' | 'en'>('vi');
+  const { lang, setLang } = useSiteData();
   const t = translations[lang];
 
   return (
@@ -1882,7 +1935,7 @@ export default function App() {
       <ScrollToTop />
       <div className="min-h-screen selection:bg-iec-primary selection:text-white">
         <Routes>
-          <Route path="/" element={<MainLayout t={t} onPartnerClick={() => setIsPartnerModalOpen(true)} lang={lang} setLang={setLang} />} />
+          <Route path="/" element={<MainLayout t={t} onPartnerClick={() => setIsPartnerModalOpen(true)} />} />
           <Route path="/hub" element={
             <>
               <Navbar 
@@ -1895,7 +1948,7 @@ export default function App() {
               <Footer t={t} />
             </>
           } />
-          <Route path="/hub/:category/:slug" element={
+          <Route path="/hub/:slug" element={
             <>
               <Navbar 
                 onPartnerClick={() => setIsPartnerModalOpen(true)} 

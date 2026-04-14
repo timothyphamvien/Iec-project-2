@@ -1,0 +1,100 @@
+{
+  "entities": {
+    "Category": {
+      "title": "Category",
+      "description": "Content category for posts, events, docs, etc.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": {
+          "type": "object",
+          "properties": {
+            "vi": { "type": "string" },
+            "en": { "type": "string" }
+          }
+        },
+        "slug": { "type": "string" },
+        "parentId": { "type": "string" },
+        "type": { "type": "string", "enum": ["post", "event", "doc", "partner", "media"] }
+      },
+      "required": ["id", "name", "slug", "type"]
+    },
+    "Post": {
+      "title": "Post",
+      "description": "A blog post, event, or document entry.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "slug": { "type": "string" },
+        "title": { "type": "object", "properties": { "vi": { "type": "string" }, "en": { "type": "string" } } },
+        "excerpt": { "type": "object", "properties": { "vi": { "type": "string" }, "en": { "type": "string" } } },
+        "content": { "type": "object", "properties": { "vi": { "type": "string" }, "en": { "type": "string" } } },
+        "image": { "type": "string" },
+        "categoryId": { "type": "string" },
+        "date": { "type": "string" },
+        "author": { "type": "string" },
+        "featured": { "type": "boolean" },
+        "tags": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["id", "slug", "title", "categoryId"]
+    },
+    "Partner": {
+      "title": "Partner",
+      "description": "Strategic partner or ecosystem member.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "logo": { "type": "string" },
+        "description": { "type": "object", "properties": { "vi": { "type": "string" }, "en": { "type": "string" } } },
+        "link": { "type": "string" },
+        "featured": { "type": "boolean" },
+        "categoryId": { "type": "string" }
+      },
+      "required": ["id", "name", "logo", "categoryId"]
+    },
+    "User": {
+      "title": "User",
+      "description": "Admin or editor user.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "username": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "editor", "viewer"] }
+      },
+      "required": ["id", "username", "email", "role"]
+    },
+    "SiteConfig": {
+      "title": "Site Config",
+      "description": "Global settings and homepage content.",
+      "type": "object",
+      "properties": {
+        "homepage": { "type": "object" },
+        "settings": { "type": "object" }
+      }
+    }
+  },
+  "firestore": {
+    "categories/{categoryId}": {
+      "schema": "Category",
+      "description": "Collection of content categories."
+    },
+    "posts/{postId}": {
+      "schema": "Post",
+      "description": "Collection of posts, events, and documents."
+    },
+    "partners/{partnerId}": {
+      "schema": "Partner",
+      "description": "Collection of partners."
+    },
+    "users/{userId}": {
+      "schema": "User",
+      "description": "Collection of administrative users."
+    },
+    "config/{configId}": {
+      "schema": "SiteConfig",
+      "description": "Singleton configurations for homepage and settings."
+    }
+  }
+}

@@ -14,7 +14,23 @@ const Skeleton = ({ className }: { className?: string }) => (
   <div className={`animate-pulse bg-iec-primary/5 rounded-lg ${className}`} />
 );
 
-const ImageWithSkeleton = ({ src, alt, className, referrerPolicy, loading = "lazy" }: { src: string, alt: string, className?: string, referrerPolicy?: "no-referrer" | "no-referrer-when-downgrade" | "origin" | "origin-when-cross-origin" | "same-origin" | "strict-origin" | "strict-origin-when-cross-origin" | "unsafe-url", loading?: "lazy" | "eager" }) => {
+const ImageWithSkeleton = ({ 
+  src, 
+  alt, 
+  className, 
+  referrerPolicy, 
+  loading = "lazy",
+  srcSet,
+  sizes
+}: { 
+  src: string, 
+  alt: string, 
+  className?: string, 
+  referrerPolicy?: "no-referrer" | "no-referrer-when-downgrade" | "origin" | "origin-when-cross-origin" | "same-origin" | "strict-origin" | "strict-origin-when-cross-origin" | "unsafe-url", 
+  loading?: "lazy" | "eager",
+  srcSet?: string,
+  sizes?: string
+}) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
 
@@ -25,6 +41,8 @@ const ImageWithSkeleton = ({ src, alt, className, referrerPolicy, loading = "laz
       )}
       <img
         src={src}
+        srcSet={srcSet}
+        sizes={sizes}
         alt={alt}
         className={`${className} transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
         onLoad={() => setIsLoaded(true)}
@@ -362,6 +380,8 @@ const MOCK_POSTS: Post[] = [
   }
 ];
 
+import { useSiteData, Language } from './context/SiteContext';
+
 // --- Components ---
 
 const TableOfContents = ({ items }: { items: TOCItem[] }) => {
@@ -496,44 +516,56 @@ const ArticleOverview = ({ items }: { items: string[] }) => (
   </section>
 );
 
-const PostCard = ({ post, onClick }: { post: Post, onClick: (slug: string) => void, key?: any }) => (
-  <article 
-    className="group cursor-pointer flex flex-col h-full bg-white rounded-[2rem] overflow-hidden border border-gray-100 hover:shadow-2xl hover:shadow-black/5 transition-all duration-500"
-    onClick={() => onClick(post.slug)}
-  >
-    <div className="relative aspect-[16/10] overflow-hidden">
-      <ImageWithSkeleton 
-        src={post.image} 
-        alt={post.title}
-        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-        referrerPolicy="no-referrer"
-      />
-      <div className="absolute top-6 left-6">
-        <span className="bg-white/90 backdrop-blur-sm px-4 py-1.5 rounded-xl text-[10px] font-bold text-iec-primary uppercase tracking-widest shadow-sm">
-          {post.categoryLabel}
-        </span>
-      </div>
-    </div>
-    <div className="p-8 flex flex-col flex-grow">
-      <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">
-        <span>{post.date}</span>
-        <span className="text-gray-200">•</span>
-        <span>{post.readTime}</span>
-      </div>
-      <h3 className="text-xl font-bold text-iec-accent mb-4 group-hover:text-iec-primary transition-colors line-clamp-2 leading-snug tracking-tight">
-        {post.title}
-      </h3>
-      <p className="text-gray-500 line-clamp-2 mb-8 flex-grow leading-relaxed font-medium text-sm">
-        {post.excerpt}
-      </p>
-      <div className="flex items-center text-iec-primary font-bold text-sm gap-2 group-hover:gap-3 transition-all mt-auto">
-        Đọc chi tiết <ArrowRight size={16} />
-      </div>
-    </div>
-  </article>
-);
+const PostCard = ({ post, onClick, lang }: { post: any, onClick: (slug: string) => void, lang: Language, key?: any }) => {
+  const seed = post.image.split('seed/')[1]?.split('/')[0] || 'post';
+  const srcSet = `
+    https://picsum.photos/seed/${seed}/400/250 400w,
+    https://picsum.photos/seed/${seed}/800/500 800w,
+    https://picsum.photos/seed/${seed}/1200/750 1200w
+  `;
+  const sizes = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw";
 
-const PostDetail = ({ post, onBack }: { post: Post, onBack: () => void }) => {
+  return (
+    <article 
+      className="group cursor-pointer flex flex-col h-full bg-white rounded-[2rem] overflow-hidden border border-gray-100 hover:shadow-2xl hover:shadow-black/5 transition-all duration-500"
+      onClick={() => onClick(post.slug)}
+    >
+      <div className="relative aspect-[16/10] overflow-hidden">
+        <ImageWithSkeleton 
+          src={post.image} 
+          srcSet={srcSet}
+          sizes={sizes}
+          alt={post.title[lang]}
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          referrerPolicy="no-referrer"
+        />
+        <div className="absolute top-6 left-6">
+          <span className="bg-white/90 backdrop-blur-sm px-4 py-1.5 rounded-xl text-[10px] font-bold text-iec-primary uppercase tracking-widest shadow-sm">
+            {post.categoryLabel}
+          </span>
+        </div>
+      </div>
+      <div className="p-8 flex flex-col flex-grow">
+        <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">
+          <span>{post.date}</span>
+          <span className="text-gray-200">•</span>
+          <span>{post.readTime || '5 min read'}</span>
+        </div>
+        <h3 className="text-xl font-bold text-iec-accent mb-4 group-hover:text-iec-primary transition-colors line-clamp-2 leading-snug tracking-tight">
+          {post.title[lang]}
+        </h3>
+        <p className="text-gray-500 line-clamp-2 mb-8 flex-grow leading-relaxed font-medium text-sm">
+          {post.excerpt[lang] || (post.content[lang] ? post.content[lang].replace(/<[^>]*>/g, '').substring(0, 160) + '...' : '')}
+        </p>
+        <div className="flex items-center text-iec-primary font-bold text-sm gap-2 group-hover:gap-3 transition-all mt-auto">
+          {lang === 'vi' ? 'Đọc chi tiết' : 'Read more'} <ArrowRight size={16} />
+        </div>
+      </div>
+    </article>
+  );
+};
+
+const PostDetail = ({ post, onBack, lang, data }: { post: any, onBack: () => void, lang: Language, data: any }) => {
   const navigate = useNavigate();
   const [tocItems, setTocItems] = useState<TOCItem[]>([]);
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -549,7 +581,7 @@ const PostDetail = ({ post, onBack }: { post: Post, onBack: () => void }) => {
     const bookmarks = JSON.parse(localStorage.getItem('iec_bookmarks') || '[]');
     let newBookmarks;
     if (bookmarks.includes(post.id)) {
-      newBookmarks = bookmarks.filter((id: number) => id !== post.id);
+      newBookmarks = bookmarks.filter((id: string) => id !== post.id);
       setIsBookmarked(false);
     } else {
       newBookmarks = [...bookmarks, post.id];
@@ -559,7 +591,7 @@ const PostDetail = ({ post, onBack }: { post: Post, onBack: () => void }) => {
   };
 
   const shareUrl = window.location.href;
-  const shareTitle = post.title;
+  const shareTitle = post.title[lang];
 
   const socialShares = [
     { name: 'Facebook', icon: <Facebook size={18} />, url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}` },
@@ -568,29 +600,23 @@ const PostDetail = ({ post, onBack }: { post: Post, onBack: () => void }) => {
   ];
 
   const relatedPosts = useMemo(() => {
-    return MOCK_POSTS.filter(p => p.id !== post.id && p.categorySlug === post.categorySlug);
-  }, [post.id, post.categorySlug]);
+    return data.posts.filter((p: any) => p.id !== post.id && p.categoryId === post.categoryId).slice(0, 3);
+  }, [post.id, post.categoryId, data.posts]);
 
   useEffect(() => {
     if (contentRef.current) {
       const headings = contentRef.current.querySelectorAll('h2');
-      const items: TOCItem[] = Array.from(headings).map((h) => ({
-        id: (h as HTMLElement).id,
-        text: (h as HTMLElement).innerText
-      }));
+      const items: TOCItem[] = Array.from(headings).map((h, i) => {
+        const id = `section-${i}`;
+        (h as HTMLElement).id = id;
+        return {
+          id,
+          text: (h as HTMLElement).innerText
+        };
+      });
       setTocItems(items);
     }
-  }, [post.content]);
-
-  const scrollRelated = (direction: 'left' | 'right') => {
-    if (relatedRef.current) {
-      const scrollAmount = 400;
-      relatedRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth'
-      });
-    }
-  };
+  }, [post.content, lang]);
 
   return (
     <motion.div 
@@ -606,18 +632,20 @@ const PostDetail = ({ post, onBack }: { post: Post, onBack: () => void }) => {
           className="flex items-center gap-2 text-gray-400 hover:text-iec-primary font-bold text-sm uppercase tracking-widest mb-12 transition-colors group"
         >
           <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-          Quay lại trạm thông tin
+          {lang === 'vi' ? 'Quay lại trạm thông tin' : 'Back to hub'}
         </button>
 
         {/* Article Header */}
         <header className="max-w-[1200px] mb-16 text-center">
           <div className="flex items-center justify-center gap-3 text-[10px] font-bold text-iec-primary uppercase tracking-[0.2em] mb-6">
-            <span className="bg-iec-primary/10 px-3 py-1 rounded-lg">{post.categoryLabel}</span>
+            <span className="bg-iec-primary/10 px-3 py-1 rounded-lg">
+              {data.categories?.find((c: any) => c.id === post.categoryId)?.name[lang]}
+            </span>
             <span className="text-gray-300">•</span>
             <span className="text-gray-400">{post.date}</span>
           </div>
-          <h1 className="text-2xl md:text-4xl font-bold text-iec-accent mb-10 leading-[1.1] tracking-tight w-full">
-            {post.title}
+          <h1 className="text-2xl md:text-4xl font-bold text-iec-accent mb-10 leading-[1.1] tracking-tight w-full italic">
+            {post.title[lang]}
           </h1>
         </header>
 
@@ -625,7 +653,7 @@ const PostDetail = ({ post, onBack }: { post: Post, onBack: () => void }) => {
         <div className="mb-16">
           <ImageWithSkeleton 
             src={post.image} 
-            alt={post.title} 
+            alt={post.title[lang]} 
             className="w-full aspect-[21/9] object-cover rounded-[2.5rem] shadow-2xl shadow-black/5" 
             loading="eager"
           />
@@ -640,8 +668,6 @@ const PostDetail = ({ post, onBack }: { post: Post, onBack: () => void }) => {
           <main className="flex-grow max-w-[800px]">
             <MobileTOC items={tocItems} />
             
-            <ArticleOverview items={post.overview} />
-
             <article 
               ref={contentRef}
               className="prose prose-lg max-w-none text-gray-600 leading-[1.8]
@@ -650,20 +676,20 @@ const PostDetail = ({ post, onBack }: { post: Post, onBack: () => void }) => {
                 prose-p:mb-8 prose-li:mb-4
                 prose-strong:text-iec-accent prose-strong:font-bold
                 prose-img:rounded-[2rem] prose-img:shadow-xl prose-img:my-16"
-              dangerouslySetInnerHTML={{ __html: post.content }}
+              dangerouslySetInnerHTML={{ __html: post.content[lang] }}
             />
 
             {/* Share & Tags */}
             <div className="mt-24 pt-12 border-t border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-8">
               <div className="flex flex-wrap gap-2">
-                {post.tags.map(tag => (
+                {post.tags.map((tag: string) => (
                   <span key={tag} className="px-5 py-2 bg-gray-50 text-gray-500 text-xs font-bold rounded-full hover:bg-iec-primary hover:text-white transition-colors cursor-pointer">
                     #{tag}
                   </span>
                 ))}
               </div>
               <div className="flex items-center gap-4">
-                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Chia sẻ:</span>
+                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{lang === 'vi' ? 'Chia sẻ:' : 'Share:'}</span>
                 <div className="flex gap-2">
                   {socialShares.map(social => (
                     <a 
@@ -693,38 +719,25 @@ const PostDetail = ({ post, onBack }: { post: Post, onBack: () => void }) => {
 
       {/* Related Articles Section */}
       {relatedPosts.length > 0 && (
-        <section className="bg-gray-50 py-32 mt-24 overflow-hidden">
+        <section className="bg-gray-50 py-32 mt-24">
           <div className="max-w-[1200px] mx-auto px-6">
-            <div className="flex items-center justify-between mb-16">
-              <h3 className="text-3xl font-bold text-iec-accent tracking-tight">Bài viết liên quan</h3>
-              <div className="flex items-center gap-4">
-                <button 
-                  onClick={() => scrollRelated('left')}
-                  className="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center text-iec-accent hover:bg-iec-primary hover:text-white hover:border-iec-primary transition-all"
-                >
-                  <ArrowLeft size={20} />
-                </button>
-                <button 
-                  onClick={() => scrollRelated('right')}
-                  className="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center text-iec-accent hover:bg-iec-primary hover:text-white hover:border-iec-primary transition-all"
-                >
-                  <ArrowRight size={20} />
-                </button>
-              </div>
-            </div>
+            <h3 className="text-3xl font-bold text-iec-accent tracking-tight mb-16">{lang === 'vi' ? 'Bài viết liên quan' : 'Related articles'}</h3>
             
-            <div 
-              ref={relatedRef}
-              className="flex gap-10 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-8"
-            >
-              {relatedPosts.map(p => (
-                <div key={p.id} className="min-w-[300px] md:min-w-[380px] snap-start">
-                  <PostCard post={p} onClick={() => {
-                    navigate(`/hub/${p.categorySlug}/${p.slug}`);
-                    window.scrollTo(0, 0);
-                  }} />
-                </div>
-              ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {relatedPosts.map((p: any) => (
+              <PostCard 
+                key={p.id} 
+                post={{
+                  ...p,
+                  categoryLabel: data.categories?.find((c: any) => c.id === p.categoryId)?.name[lang] || ''
+                }} 
+                lang={lang}
+                onClick={() => {
+                  navigate(`/hub/${p.slug}`);
+                  window.scrollTo(0, 0);
+                }} 
+              />
+            ))}
             </div>
           </div>
         </section>
@@ -734,20 +747,42 @@ const PostDetail = ({ post, onBack }: { post: Post, onBack: () => void }) => {
 };
 
 export default function InformationHub() {
+  const { data, lang } = useSiteData();
   const { category, slug } = useParams();
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const postsPerPage = 6;
   
-  const selectedPost = useMemo(() => MOCK_POSTS.find(p => p.slug === slug), [slug]);
+  const posts = data.posts || [];
+  const categories = data.categories || [];
+
+  const selectedPost = useMemo(() => posts.find(p => p.slug === slug), [slug, posts]);
 
   const filteredPosts = useMemo(() => {
-    return MOCK_POSTS.filter(post => {
-      const matchesCategory = activeCategory === 'all' || post.categorySlug === CATEGORIES.find(c => c.id === activeCategory)?.slug;
+    return posts.filter(post => {
+      const matchesCategory = activeCategory === 'all' || post.categoryId === activeCategory;
       return matchesCategory;
     });
-  }, [activeCategory]);
+  }, [activeCategory, posts]);
 
-  const featuredPost = useMemo(() => MOCK_POSTS.find(p => p.featured), []);
+  const displayPosts = useMemo(() => {
+    return filteredPosts.filter(p => activeCategory !== 'all' || !p.featured);
+  }, [filteredPosts, activeCategory]);
+
+  const totalPages = Math.ceil(displayPosts.length / postsPerPage);
+  
+  const paginatedPosts = useMemo(() => {
+    const startIndex = (currentPage - 1) * postsPerPage;
+    return displayPosts.slice(startIndex, startIndex + postsPerPage);
+  }, [displayPosts, currentPage]);
+
+  const featuredPost = useMemo(() => posts.find(p => p.featured), [posts]);
+
+  // Reset page when category changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeCategory]);
 
   const handlePostClick = (post: Post) => {
     navigate(`/hub/${post.categorySlug}/${post.slug}`);
@@ -759,6 +794,8 @@ export default function InformationHub() {
       <PostDetail 
         post={selectedPost} 
         onBack={() => navigate('/hub')} 
+        lang={lang}
+        data={data}
       />
     );
   }
@@ -783,10 +820,12 @@ export default function InformationHub() {
             animate={{ opacity: 1, y: 0 }}
           >
             <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-none mb-6">
-              Trạm Thông Tin
+              {lang === 'vi' ? 'Trạm Thông Tin' : 'Information Hub'}
             </h1>
             <p className="text-xl text-white/70 font-medium max-w-2xl mx-auto leading-relaxed">
-              Nơi hội tụ tri thức, xu hướng công nghệ và những phân tích chuyên sâu từ hệ sinh thái đổi mới sáng tạo IEC.
+              {lang === 'vi' 
+                ? 'Nơi hội tụ tri thức, xu hướng công nghệ và những phân tích chuyên sâu từ hệ sinh thái đổi mới sáng tạo IEC.'
+                : 'Where knowledge, technology trends, and in-depth analysis from the IEC innovation ecosystem converge.'}
             </p>
           </motion.div>
         </div>
@@ -796,7 +835,23 @@ export default function InformationHub() {
         {/* Category Filter */}
         <nav className="mb-16">
           <div className="flex gap-10 overflow-x-auto scrollbar-hide pb-2 border-b border-gray-100">
-            {CATEGORIES.map((cat) => (
+            <button
+              onClick={() => setActiveCategory('all')}
+              className={`relative pb-4 text-sm font-bold transition-all whitespace-nowrap tracking-tight ${
+                activeCategory === 'all' 
+                ? 'text-iec-primary' 
+                : 'text-gray-400 hover:text-gray-600'
+              }`}
+            >
+              {lang === 'vi' ? 'Tất cả' : 'All'}
+              {activeCategory === 'all' && (
+                <motion.div 
+                  layoutId="activeCategory"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-iec-primary"
+                />
+              )}
+            </button>
+            {categories.filter(c => c.type === 'post').map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
@@ -806,7 +861,7 @@ export default function InformationHub() {
                   : 'text-gray-400 hover:text-gray-600'
                 }`}
               >
-                {cat.name}
+                {cat.name[lang]}
                 {activeCategory === cat.id && (
                   <motion.div 
                     layoutId="activeCategory"
@@ -818,15 +873,15 @@ export default function InformationHub() {
           </div>
         </nav>
 
-        {/* Featured Post (LOOK) */}
+        {/* Featured Post */}
         {activeCategory === 'all' && featuredPost && (
-          <section className="mb-24 group cursor-pointer" onClick={() => handlePostClick(featuredPost)}>
+          <section className="mb-24 group cursor-pointer" onClick={() => handlePostClick(featuredPost as any)}>
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
               <div className="lg:col-span-7">
                 <div className="relative aspect-[16/10] rounded-[2.5rem] overflow-hidden shadow-2xl">
                   <ImageWithSkeleton 
                     src={featuredPost.image} 
-                    alt={featuredPost.title}
+                    alt={featuredPost.title[lang]}
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                     referrerPolicy="no-referrer"
                     loading="eager"
@@ -836,37 +891,43 @@ export default function InformationHub() {
               </div>
               <div className="lg:col-span-5">
                 <div className="flex items-center gap-3 text-[10px] font-bold text-iec-primary uppercase tracking-[0.2em] mb-6">
-                  <span className="bg-iec-primary/10 px-3 py-1 rounded-full">{featuredPost.categoryLabel}</span>
+                  <span className="bg-iec-primary/10 px-3 py-1 rounded-full">
+                    {categories.find(c => c.id === featuredPost.categoryId)?.name[lang]}
+                  </span>
                   <span className="text-gray-300">•</span>
                   <span className="text-gray-400">{featuredPost.date}</span>
                 </div>
                 <h2 className="text-4xl md:text-5xl font-bold text-iec-accent mb-8 leading-[1.1] tracking-tight group-hover:text-iec-primary transition-colors">
-                  {featuredPost.title}
+                  {featuredPost.title[lang]}
                 </h2>
                 <p className="text-lg text-gray-500 mb-10 leading-relaxed line-clamp-3 font-medium">
-                  {featuredPost.excerpt}
+                  {featuredPost.excerpt[lang]}
                 </p>
                 <div className="flex items-center text-iec-primary font-bold text-sm gap-2 group-hover:gap-3 transition-all">
-                  Đọc bài viết nổi bật <ArrowRight size={18} />
+                  {lang === 'vi' ? 'Đọc bài viết nổi bật' : 'Read featured post'} <ArrowRight size={18} />
                 </div>
               </div>
             </div>
           </section>
         )}
 
-        {/* Article Grid (TOUCH) */}
+        {/* Article Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20">
-          {filteredPosts.filter(p => activeCategory !== 'all' || !p.featured).map((post) => (
-            <PostCard 
-              key={post.id} 
-              post={post} 
-              onClick={() => handlePostClick(post)} 
-            />
-          ))}
+            {paginatedPosts.map((post) => (
+              <PostCard 
+                key={post.id} 
+                post={{
+                  ...post,
+                  categoryLabel: categories.find(c => c.id === post.categoryId)?.name[lang] || ''
+                }} 
+                lang={lang}
+                onClick={() => handlePostClick(post as any)} 
+              />
+            ))}
         </div>
 
         {/* Empty State */}
-        {filteredPosts.length === 0 && (
+        {displayPosts.length === 0 && (
           <div className="text-center py-40">
             <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-8 text-gray-300">
               <Info size={48} />
@@ -876,11 +937,39 @@ export default function InformationHub() {
           </div>
         )}
 
-        {/* Pagination CTA */}
-        {filteredPosts.length > 12 && (
-          <div className="mt-32 flex justify-center">
-            <button className="px-16 py-5 bg-iec-accent text-white rounded-2xl text-sm font-bold hover:bg-iec-primary transition-all shadow-xl shadow-iec-accent/10">
-              Xem thêm bài viết
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-32 flex justify-center items-center gap-4">
+            <button 
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(prev => prev - 1)}
+              className="p-4 rounded-xl bg-gray-50 text-gray-400 hover:text-iec-primary disabled:opacity-30 transition-all"
+            >
+              <ArrowLeft size={20} />
+            </button>
+            
+            <div className="flex gap-2">
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`w-12 h-12 rounded-xl text-sm font-bold transition-all ${
+                    currentPage === i + 1 
+                    ? 'bg-iec-primary text-white shadow-lg shadow-iec-primary/20' 
+                    : 'bg-gray-50 text-gray-400 hover:bg-gray-100'
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+
+            <button 
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(prev => prev + 1)}
+              className="p-4 rounded-xl bg-gray-50 text-gray-400 hover:text-iec-primary disabled:opacity-30 transition-all"
+            >
+              <ArrowRight size={20} />
             </button>
           </div>
         )}
